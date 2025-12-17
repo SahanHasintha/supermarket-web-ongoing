@@ -1,0 +1,61 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import ScrollToTop from './components/ScrollToTop'
+// import Welcome from './components/Welcome' // Hidden for now
+import Home from './pages/Home'
+import About from './pages/About'
+import Services from './pages/Services'
+import Products from './pages/Products'
+import Register from './pages/Register'
+import Login from './pages/Login'
+
+function App() {
+  return (
+    <Router>
+      <ScrollToTop />
+      <div className="min-h-screen">
+        <Routes>
+          {/* Welcome page is hidden - uncomment the line below to enable it */}
+          {/* <Route path="/welcome" element={<Welcome />} /> */}
+          
+          {/* Home is now the default page */}
+          <Route path="/" element={
+            <>
+              <Navbar />
+              <Home />
+            </>
+          } />
+          <Route path="/home" element={
+            <>
+              <Navbar />
+              <Home />
+            </>
+          } />
+          <Route path="/about" element={
+            <>
+              <Navbar />
+              <About />
+            </>
+          } />
+          <Route path="/services" element={
+            <>
+              <Navbar />
+              <Services />
+            </>
+          } />
+          <Route path="/products" element={
+            <>
+              <Navbar />
+              <Products />
+            </>
+          } />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </div>
+    </Router>
+  )
+}
+
+export default App
+
