@@ -14,6 +14,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <div className="min-h-screen">
+        <Navbar />
         <Routes>
           {/* Welcome page is hidden - uncomment the line below to enable it */}
           {/* <Route path="/welcome" element={<Welcome />} /> */}
@@ -21,31 +22,26 @@ function App() {
           {/* Home is now the default page */}
           <Route path="/" element={
             <>
-              <Navbar />
               <Home />
             </>
           } />
           <Route path="/home" element={
             <>
-              <Navbar />
               <Home />
             </>
           } />
           <Route path="/about" element={
             <>
-              <Navbar />
               <About />
             </>
           } />
           <Route path="/services" element={
             <>
-              <Navbar />
               <Services />
             </>
           } />
           <Route path="/products" element={
             <>
-              <Navbar />
               <Products />
             </>
           } />
