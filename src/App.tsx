@@ -8,6 +8,7 @@ import Services from './pages/Services'
 import Products from './pages/Products'
 import Register from './pages/Register'
 import Login from './pages/Login'
+import ProtectedRoute from './routes/ProtectedRoute'
 
 function App() {
   return (
@@ -15,39 +16,41 @@ function App() {
       <ScrollToTop />
       <div className="min-h-screen">
         <Navbar />
-        <Routes>
-          {/* Welcome page is hidden - uncomment the line below to enable it */}
-          {/* <Route path="/welcome" element={<Welcome />} /> */}
-          
-          {/* Home is now the default page */}
-          <Route path="/" element={
-            <>
-              <Home />
-            </>
-          } />
-          <Route path="/home" element={
-            <>
-              <Home />
-            </>
-          } />
-          <Route path="/about" element={
-            <>
-              <About />
-            </>
-          } />
-          <Route path="/services" element={
-            <>
-              <Services />
-            </>
-          } />
-          <Route path="/products" element={
-            <>
-              <Products />
-            </>
-          } />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
+        <ProtectedRoute>
+          <Routes>
+            {/* Welcome page is hidden - uncomment the line below to enable it */}
+            {/* <Route path="/welcome" element={<Welcome />} /> */}
+            
+            {/* Home is now the default page */}
+            <Route path="/" element={
+              <>
+                <Home />
+              </>
+            } />
+            <Route path="/home" element={
+              <>
+                <Home />
+              </>
+            } />
+            <Route path="/about" element={
+              <>
+                <About />
+              </>
+            } />
+            <Route path="/services" element={
+              <>
+                <Services />
+              </>
+            } />
+            <Route path="/products" element={
+              <>
+                <Products />
+              </>
+            } />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+          </Routes>
+        </ProtectedRoute>
       </div>
     </Router>
   )
