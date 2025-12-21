@@ -16,7 +16,6 @@ function App() {
       <ScrollToTop />
       <div className="min-h-screen">
         <Navbar />
-        <ProtectedRoute>
           <Routes>
             {/* Welcome page is hidden - uncomment the line below to enable it */}
             {/* <Route path="/welcome" element={<Welcome />} /> */}
@@ -42,15 +41,12 @@ function App() {
                 <Services />
               </>
             } />
-            <Route path="/products" element={
-              <>
-                <Products />
-              </>
-            } />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/products" element={<Products />} />
+            </Route>
           </Routes>
-        </ProtectedRoute>
       </div>
     </Router>
   )

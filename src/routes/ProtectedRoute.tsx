@@ -1,11 +1,7 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAppSelector } from '../hooks/useAppSelector';
 
-interface Props {
-  children: JSX.Element;
-}
-
-export default function ProtectedRoute({ children }: Props) {
+export default function ProtectedRoute() {
   const isAuth = useAppSelector(state => state.auth.isAuthenticated);
-  return isAuth ? children : <Navigate to="/login" replace />;
+  return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
 }
