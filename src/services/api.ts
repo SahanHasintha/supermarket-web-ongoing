@@ -1,17 +1,54 @@
 import axios from 'axios';
 import { store } from '../app/store';
+import { refreshToken } from '../features/auth/authThunks';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'http://localhost:3001/api',
   withCredentials: true, // refresh cookie
 });
 
-api.interceptors.request.use((config: any) => {
-  const token = store.getState().auth.accessToken;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Function to set up the interceptor after store is created
+export const setupApiInterceptors = (getState: () => any) => {
+  api.interceptors.request.use((config: any) => {
+    const token = getState().auth.accessToken;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  // api.interceptors.response.use(
+  //   (response) => response,
+  //   async (error) => {
+  //     const originalRequest = error.config;
+  
+  //     if (
+  //       error.response?.status === 401 &&
+  //       !originalRequest._retry 
+  //       // && !originalRequest.url.includes('/auth/login') 
+  //       // && !originalRequest.url.includes('/auth/refresh')
+  //     ) {
+  //       originalRequest._retry = true;
+  //       console.log("01");
+  //       try {
+  //         const result = await store.dispatch(refreshToken());
+  
+  //         if (refreshToken.fulfilled.match(result)) {
+  //           const newAccessToken = result.payload;
+  
+  //           originalRequest.headers.Authorization =
+  //             `Bearer ${newAccessToken}`;
+  
+  //           return api(originalRequest);
+  //         }
+  //       } catch (err) {
+  //         return Promise.reject(err);
+  //       }
+  //     }
+  
+  //     return Promise.reject(error);
+  //   }
+  // );
+};
 
 export default api;

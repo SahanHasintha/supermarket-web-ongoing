@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { login } from '../features/auth/authThunks';
 
 interface FormData {
   email: string;
@@ -20,6 +22,7 @@ const Login: React.FC = () => {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,10 +40,15 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Functionality will be added later
-    console.log('Login form submitted:', formData);
+    try {
+      dispatch(login({email: formData.email, password : formData.password}) as any)
+    } catch (error) {
+      console.log(error);
+    }
+    
   };
 
   return (

@@ -25,19 +25,27 @@ const authSlice = createSlice({
         state.accessToken = action.payload.accessToken;
         state.user = action.payload.user;
         state.isAuthenticated = true;
+        state.error = null;
       })
-      .addCase(login.rejected, (state) => {
+      .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = 'Login failed';
+        state.error = action.error.message || 'Login failed';
+        state.isAuthenticated = false;
       })
       .addCase(refreshToken.fulfilled, (state, action) => {
         state.accessToken = action.payload;
         state.isAuthenticated = true;
       })
+      .addCase(refreshToken.rejected, (state) => {
+        state.accessToken = null;
+        state.user = null;
+        state.isAuthenticated = false;
+      })
       .addCase(logoutApi.fulfilled, (state) => {
         state.accessToken = null;
         state.user = null;
         state.isAuthenticated = false;
+        state.error = null;
       });
   },
 });
