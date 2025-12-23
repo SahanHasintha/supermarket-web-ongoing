@@ -9,7 +9,7 @@ export const store = configureStore({
 });
 
 // Setup API interceptors after store is created
-setupApiInterceptors(() => store.getState());
+setupApiInterceptors(() => store.getState(), store.dispatch);
 
 // Type for dispatch
 export type AppDispatch = typeof store.dispatch;

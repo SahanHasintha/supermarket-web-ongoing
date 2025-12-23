@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { store } from '../app/store';
 import { refreshToken } from '../features/auth/authThunks';
 
 const api = axios.create({
@@ -8,7 +7,7 @@ const api = axios.create({
 });
 
 // Function to set up the interceptor after store is created
-export const setupApiInterceptors = (getState: () => any) => {
+export const setupApiInterceptors = (getState: () => any, dispatch: any) => {
   api.interceptors.request.use((config: any) => {
     const token = getState().auth.accessToken;
     if (token) {
@@ -17,38 +16,38 @@ export const setupApiInterceptors = (getState: () => any) => {
     return config;
   });
 
-  // api.interceptors.response.use(
-  //   (response) => response,
-  //   async (error) => {
-  //     const originalRequest = error.config;
+  api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
   
-  //     if (
-  //       error.response?.status === 401 &&
-  //       !originalRequest._retry 
-  //       // && !originalRequest.url.includes('/auth/login') 
-  //       // && !originalRequest.url.includes('/auth/refresh')
-  //     ) {
-  //       originalRequest._retry = true;
-  //       console.log("01");
-  //       try {
-  //         const result = await store.dispatch(refreshToken());
+      if (
+        error.response?.status === 401 &&
+        !originalRequest._retry 
+        // && !originalRequest.url.includes('/auth/login') 
+        // && !originalRequest.url.includes('/auth/refresh')
+      ) {
+        originalRequest._retry = true;
+        console.log("01");
+        try {
+          const result = await dispatch(refreshToken());
+          console.log("02",result.payload);
+          if (refreshToken.fulfilled.match(result)) {
+            const newAccessToken = result.payload;
   
-  //         if (refreshToken.fulfilled.match(result)) {
-  //           const newAccessToken = result.payload;
+            originalRequest.headers.Authorization =
+              `Bearer ${newAccessToken}`;
   
-  //           originalRequest.headers.Authorization =
-  //             `Bearer ${newAccessToken}`;
+            return api(originalRequest);
+          }
+        } catch (err) {
+          return Promise.reject(err);
+        }
+      }
   
-  //           return api(originalRequest);
-  //         }
-  //       } catch (err) {
-  //         return Promise.reject(err);
-  //       }
-  //     }
-  
-  //     return Promise.reject(error);
-  //   }
-  // );
+      return Promise.reject(error);
+    }
+  );
 };
 
 export default api;

@@ -4,5 +4,6 @@ export interface AuthState {
     loading: boolean;
     error: string | null;
     user: { id: string; email: string } | null;
+    authChecked: boolean;
   }
   
