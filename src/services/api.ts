@@ -21,23 +21,25 @@ export const setupApiInterceptors = (getState: () => any, dispatch: any) => {
     async (error) => {
       const originalRequest = error.config;
   
+      if (originalRequest.url?.includes('/auth/refresh')) {
+        return Promise.reject(error);
+      }
+
       if (
         error.response?.status === 401 &&
-        !originalRequest._retry 
-        // && !originalRequest.url.includes('/auth/login') 
-        // && !originalRequest.url.includes('/auth/refresh')
+        !originalRequest._retry
       ) {
         originalRequest._retry = true;
-        console.log("01");
+
         try {
           const result = await dispatch(refreshToken());
-          console.log("02",result.payload);
+
           if (refreshToken.fulfilled.match(result)) {
             const newAccessToken = result.payload;
-  
+
             originalRequest.headers.Authorization =
               `Bearer ${newAccessToken}`;
-  
+
             return api(originalRequest);
           }
         } catch (err) {
