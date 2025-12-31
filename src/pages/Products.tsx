@@ -3,6 +3,7 @@ import CreateProductModal from '../components/CreateProductModal';
 import { Product } from '../types/Product';
 import {createProduct} from '../services/ProductService';
 import { generateUploadUrl } from '../services/UploadService';
+import ProductCard from '../components/ProductCard';
 
 const Products: React.FC = () => {
   const [showCreateProductModal, setShowCreateProductModal] = useState(false);
@@ -115,7 +116,7 @@ const Products: React.FC = () => {
         </div>
         <div className="bg-white rounded-xl p-12 shadow-lg text-center">
           <p className="text-xl text-gray-600">
-            Products page coming soon...
+            <ProductCard />
           </p>
         </div>
       </div>
