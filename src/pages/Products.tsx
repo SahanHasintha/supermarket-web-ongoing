@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CreateProductModal from '../components/CreateProductModal';
-import { Product } from '../types/Product';
+import { CreateProductDto, Product } from '../types/Product';
 import {createProduct} from '../services/ProductService';
 import { generateUploadUrl } from '../services/UploadService';
 import ProductCard from '../components/ProductCard';
+import { getProducts } from '../services/ProductService';
+import { useSelector } from 'react-redux';
+import { RootState } from '../app/store';
 
 const Products: React.FC = () => {
   const [showCreateProductModal, setShowCreateProductModal] = useState(false);
-
+  const [products, setProducts] = useState<Product[]>([]);
+  const user = useSelector((state: RootState) => state.auth.user);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const products = await getProducts();
+      console.log('Products fetched:', products);
+      setProducts(products);
+    };
+    fetchProducts();
+  }, []);
   const handleOpenCreateProduct = () => {
     setShowCreateProductModal(true);
   };
@@ -16,7 +28,7 @@ const Products: React.FC = () => {
     setShowCreateProductModal(false);
   };
 
-  const handleCreateProduct = async (product: Product) => {
+  const handleCreateProduct = async (product: CreateProductDto) => {
     try {
       console.log('Creating product:', product);
       
@@ -55,11 +67,11 @@ const Products: React.FC = () => {
           console.error('Upload error details:', errorText);
           throw new Error(`Failed to upload image: ${uploadResponse.status} ${uploadResponse.statusText} - ${errorText}`);
         }
-        
+        console.log("upload response ", uploadResponse);
         console.log('Image uploaded successfully');
         
         // Construct the public URL (you might need to adjust this based on your S3 setup)
-        imageUrl = `https://your-bucket-name.s3.amazonaws.com/${uniqueKey}`;
+        imageUrl = `${uniqueKey}`;
       } else if (product.image && typeof product.image === 'string') {
         // If image is already a URL string, use it directly
         imageUrl = product.image;
@@ -107,17 +119,19 @@ const Products: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-emerald-800">
             Products
           </h1>
-          <button 
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-200"
-          onClick={handleOpenCreateProduct}
-          >
-            Create Product
-          </button>
+          {user?.role === 'ADMIN' && (
+            <button 
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors duration-200"
+            onClick={handleOpenCreateProduct}
+            >
+              Create Product
+            </button>
+          )}
         </div>
-        <div className="bg-white rounded-xl p-12 shadow-lg text-center">
-          <p className="text-xl text-gray-600">
-            <ProductCard />
-          </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products.map(prod => (
+            <ProductCard key={prod.id} product={prod} />
+          ))}
         </div>
       </div>
     </div>
@@ -125,4 +139,3 @@ const Products: React.FC = () => {
 };
 
 export default Products;
-

@@ -3,7 +3,7 @@ export interface AuthState {
     isAuthenticated: boolean;
     loading: boolean;
     error: string | null;
-    user: { id: string; email: string } | null;
+    user: { id: string; email: string, role: string } | null;
     authChecked: boolean;
   }
   

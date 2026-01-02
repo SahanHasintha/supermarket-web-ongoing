@@ -1,9 +1,14 @@
-import { Product } from '../types/Product';
+import { CreateProductDto } from '../types/Product';
 import api from './api';
 
-const createProduct = async (product: Product) => {
+const createProduct = async (product: CreateProductDto) => {
   const response = await api.post('/products', product);
   return response.data;
 };
 
-export {createProduct};
+const getProducts = async () => {
+  const response = await api.get('/products');
+  return response.data;
+};
+
+export {createProduct, getProducts};
