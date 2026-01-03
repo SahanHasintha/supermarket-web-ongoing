@@ -9,6 +9,7 @@ import Products from './pages/Products'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import ProtectedRoute from './routes/ProtectedRoute'
+import ManageProducts from './pages/ManageProducts'
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/products" element={<Products />} />
             <Route element={<ProtectedRoute />}>
+              <Route path="/manage-products" element={<ManageProducts />} />
             </Route>
           </Routes>
       </div>

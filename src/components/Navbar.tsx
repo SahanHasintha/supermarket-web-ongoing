@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="bg-gradient-to-r from-white via-green-50 to-white shadow-lg sticky top-0 z-50 border-b-2 border-green-200">
+      <nav className="bg-gradient-to-r from-white via-green-50 to-white sticky top-0 z-50 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}

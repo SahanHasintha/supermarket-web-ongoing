@@ -7,14 +7,11 @@ import ProductCard from '../components/ProductCard';
 import { getProducts } from '../services/ProductService';
 import { useSelector } from 'react-redux';
 import { RootState } from '../app/store';
-import { useNavigate } from 'react-router-dom';
 
-const Products: React.FC = () => {
+const ManageProducts: React.FC = () => {
   const [showCreateProductModal, setShowCreateProductModal] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const user = useSelector((state: RootState) => state.auth.user);
-  const navigate = useNavigate();
-  
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts();
@@ -24,8 +21,7 @@ const Products: React.FC = () => {
     fetchProducts();
   }, []);
   const handleOpenCreateProduct = () => {
-    console.log('Navigating to manage products');
-    navigate('/manage-products');
+    setShowCreateProductModal(true);
   };
 
   const handleCloseCreateProductModal = () => {
@@ -124,7 +120,7 @@ const Products: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
             <div>
               <p className="text-green-800 text-sm sm:text-base font-medium">
-                {products.length} {products.length === 1 ? 'product' : 'products'} available
+                Manage products
               </p>
             </div>
             {user?.role === 'ADMIN' && (
@@ -135,7 +131,7 @@ const Products: React.FC = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Manage Products
+                Create Product
               </button>
             )}
           </div>
@@ -175,4 +171,4 @@ const Products: React.FC = () => {
   );
 };
 
-export default Products;
+export default ManageProducts;

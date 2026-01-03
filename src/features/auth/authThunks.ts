@@ -19,6 +19,7 @@ export const refreshToken = createAsyncThunk<LoginResponse>(
   'auth/refresh',
   async () => {
     const res = await api.post<LoginResponse>('/auth/refresh');
+    console.log('Refresh token response:', res.data);
     return { accessToken: res.data.accessToken, user: res.data.user };
   }
 );

@@ -7,6 +7,7 @@ import { refreshToken } from '../features/auth/authThunks';
 export default function ProtectedRoute() {
   const dispatch = useDispatch();
   const isAuth = useAppSelector(state => state.auth.isAuthenticated);
+  const user = useAppSelector(state => state.auth.user);
   const authChecked = useAppSelector(state => state.auth.authChecked);
   const loading = useAppSelector(state => state.auth.loading);
 
@@ -20,7 +21,7 @@ export default function ProtectedRoute() {
     return <div>Checking authentication...</div>;
   }
 
-  if (!isAuth) {
+  if (!isAuth || user?.role !== 'ADMIN') {
     return <Navigate to="/login" replace />;
   }
 
