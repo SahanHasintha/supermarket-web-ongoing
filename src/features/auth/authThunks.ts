@@ -15,11 +15,11 @@ export const login = createAsyncThunk<
   return res.data;
 });
 
-export const refreshToken = createAsyncThunk<string>(
+export const refreshToken = createAsyncThunk<LoginResponse>(
   'auth/refresh',
   async () => {
-    const res = await api.post<{ accessToken: string }>('/auth/refresh');
-    return res.data.accessToken;
+    const res = await api.post<LoginResponse>('/auth/refresh');
+    return { accessToken: res.data.accessToken, user: res.data.user };
   }
 );
 

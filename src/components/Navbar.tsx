@@ -1,10 +1,20 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
+import { RootState } from '../app/store';
+import { useDispatch } from 'react-redux';
+import { logoutApi } from '../features/auth/authThunks';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const navigate = useNavigate();
+  console.log('User:', user);
+  console.log('Is Authenticated:', isAuthenticated);
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -17,6 +27,11 @@ const Navbar: React.FC = () => {
     return location.pathname === path;
   };
 
+  const handleLogout = async () => {
+    dispatch(logoutApi() as any);
+    navigate('/login');
+  }
+
   const navLinks = [
     // { name: 'Welcome', path: '/' }, // Hidden - Welcome page is disabled
     { name: 'Home', path: '/' },
@@ -27,7 +42,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <nav className="bg-gradient-to-r from-white via-emerald-50 to-white shadow-lg sticky top-0 z-50 border-b-2 border-emerald-200">
+      <nav className="bg-gradient-to-r from-white via-green-50 to-white shadow-lg sticky top-0 z-50 border-b-2 border-green-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
@@ -38,13 +53,13 @@ const Navbar: React.FC = () => {
                   alt="Wynnum Mini Supermarket Logo" 
                   className="h-16 w-auto object-contain md:h-20"
                 />
-                <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                <div className="absolute -inset-2 bg-gradient-to-r from-green-400 to-orange-400 rounded-xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
               </div>
               <div className="hidden sm:block">
-                <span className="text-2xl bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent" style={{ fontFamily: "'Pacifico', cursive" }}>
-                  Wynnum Mini Supermarket
+                <span className="text-2xl bg-gradient-to-r from-green-700 to-orange-600 bg-clip-text text-transparent" style={{ fontFamily: "'Pacifico', cursive" }}>
+                  Supermarket
                 </span>
-                <div className="h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                <div className="h-0.5 bg-gradient-to-r from-green-500 to-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
               </div>
             </Link>
 
@@ -61,8 +76,8 @@ const Navbar: React.FC = () => {
                           ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 shadow-lg font-bold'
                           : 'bg-white text-gray-800 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-400 hover:text-white shadow-md font-bold hover:shadow-2xl transform hover:scale-105'
                         : isActive(link.path)
-                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
-                        : 'bg-white text-gray-700 hover:bg-emerald-600 hover:text-white hover:shadow-2xl transform hover:scale-105'
+                        ? 'bg-gradient-to-r from-green-600 to-orange-500 text-white shadow-lg'
+                        : 'bg-white text-gray-700 hover:bg-green-600 hover:text-white hover:shadow-2xl transform hover:scale-105'
                     }`}
                   >
                     <span className="relative z-10">{link.name}</span>
@@ -71,26 +86,37 @@ const Navbar: React.FC = () => {
               </div>
               
               {/* Auth Buttons */}
-              <div className="flex items-center space-x-3">
-                <Link
-                  to="/login"
-                  className="text-emerald-600 hover:text-emerald-700 font-semibold px-4 py-2.5 rounded-full border-2 border-emerald-600 hover:border-emerald-700 transition-all duration-300 transform hover:scale-105"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold px-6 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                >
-                  Register
-                </Link>
-              </div>
+              {!isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <Link
+                    to="/login"
+                    className="text-green-600 hover:text-green-700 font-semibold px-4 py-2.5 rounded-full border-2 border-green-600 hover:border-green-700 transition-all duration-300 transform hover:scale-105"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-gradient-to-r from-green-600 to-orange-500 hover:from-green-700 hover:to-orange-600 text-white font-semibold px-6 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    Register
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handleLogout}
+                    className="text-green-600 hover:text-green-700 font-semibold px-4 py-2.5 rounded-full border-2 border-green-600 hover:border-green-700 transition-all duration-300 transform hover:scale-105"
+                  >
+                    Log Out
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Hamburger Menu Button (Mobile) */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-110"
+              className="md:hidden p-2.5 rounded-xl bg-gradient-to-r from-green-600 to-orange-500 hover:from-green-700 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-110"
               aria-label="Toggle menu"
             >
               <svg
@@ -121,12 +147,12 @@ const Navbar: React.FC = () => {
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-gradient-to-b from-white via-emerald-50 to-teal-50 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l-4 border-emerald-500 ${
+        className={`fixed top-0 right-0 h-full w-72 bg-gradient-to-b from-white via-green-50 to-orange-50 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden border-l-4 border-green-500 ${
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Close Button */}
-        <div className="flex justify-end p-4 bg-gradient-to-r from-emerald-500 to-teal-500">
+        <div className="flex justify-end p-4 bg-gradient-to-r from-green-600 to-orange-500">
           <button
             onClick={closeMobileMenu}
             className="p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-200 backdrop-blur-sm"
@@ -161,8 +187,8 @@ const Navbar: React.FC = () => {
                     ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 shadow-lg font-bold'
                     : 'bg-white text-gray-800 hover:bg-gradient-to-r hover:from-yellow-400 hover:to-orange-400 hover:text-white shadow-md font-bold hover:shadow-2xl transform hover:scale-105'
                   : isActive(link.path)
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-emerald-600 hover:text-white hover:shadow-2xl transform hover:scale-105'
+                  ? 'bg-gradient-to-r from-green-600 to-orange-500 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-green-600 hover:text-white hover:shadow-2xl transform hover:scale-105'
               }`}
             >
               {link.name}
@@ -173,21 +199,21 @@ const Navbar: React.FC = () => {
           <Link
             to="/login"
             onClick={closeMobileMenu}
-            className="px-5 py-3.5 rounded-xl font-semibold transition-all duration-300 shadow-md bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white hover:shadow-2xl transform hover:scale-105"
+            className="px-5 py-3.5 rounded-xl font-semibold transition-all duration-300 shadow-md bg-white text-green-600 border-2 border-green-600 hover:bg-green-600 hover:text-white hover:shadow-2xl transform hover:scale-105"
           >
             Login
           </Link>
           <Link
             to="/register"
             onClick={closeMobileMenu}
-            className="px-5 py-3.5 rounded-xl font-semibold transition-all duration-300 shadow-md bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 hover:shadow-2xl transform hover:scale-105"
+            className="px-5 py-3.5 rounded-xl font-semibold transition-all duration-300 shadow-md bg-gradient-to-r from-green-600 to-orange-500 text-white hover:from-green-700 hover:to-orange-600 hover:shadow-2xl transform hover:scale-105"
           >
             Register
           </Link>
         </div>
 
         {/* Sidebar Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-r from-emerald-500 to-teal-500">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-r from-green-600 to-orange-500">
           <p className="text-sm text-white font-medium text-center">
             Wynnum Mini Supermarket
           </p>
