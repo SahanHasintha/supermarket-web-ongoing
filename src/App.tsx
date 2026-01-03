@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import ScrollToTop from './components/ScrollToTop'
@@ -10,8 +11,15 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import ProtectedRoute from './routes/ProtectedRoute'
 import ManageProducts from './pages/ManageProducts'
+import { useDispatch } from 'react-redux'
+import { refreshToken } from './features/auth/authThunks'
 
 function App() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(refreshToken() as any);
+  }, []);
+
   return (
     <Router>
       <ScrollToTop />
