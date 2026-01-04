@@ -1,16 +1,17 @@
 import {useState} from 'react';
-import { Product } from '../types/Product';
+import { ProductForm } from '../types/Product';
 
-const CreateProductModal = ({ onClose, onCreate } : { onClose: () => void; onCreate: (product: Product) => void }) => {
-  const [formData, setFormData] = useState({
+const CreateProductModal = ({ onClose, onCreate } : { onClose: () => void; onCreate: (product: ProductForm) => void }) => {
+  const [formData, setFormData] = useState<ProductForm>({
     name: '',
     price: 0,
     description: '',
+    image: [],
   });
-  const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState<File[]>([]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setImage(e.target.files?.[0] || null);
+    setImage(Array.from(e.target.files || []) as File[]);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,7 +25,7 @@ const CreateProductModal = ({ onClose, onCreate } : { onClose: () => void; onCre
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    onCreate({ ...formData, image } as Product);
+    onCreate({ ...formData, image } as ProductForm);
   };
 
   return (
@@ -91,6 +92,7 @@ const CreateProductModal = ({ onClose, onCreate } : { onClose: () => void; onCre
               id="image"
               name="image"
               onChange={handleImageChange}
+              multiple={true}
               accept="image/*"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               required

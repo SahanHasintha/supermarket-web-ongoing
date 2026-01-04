@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import CreateProductModal from '../components/CreateProductModal';
-import { CreateProductDto, Product } from '../types/Product';
+import { Product, ProductForm, CreateProductDto } from '../types/Product';
 import {createProduct} from '../services/ProductService';
 import { generateUploadUrl } from '../services/UploadService';
 import ProductCard from '../components/ProductCard';
@@ -11,6 +11,7 @@ import { RootState } from '../app/store';
 const ManageProducts: React.FC = () => {
   const [showCreateProductModal, setShowCreateProductModal] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
   useEffect(() => {
     const fetchProducts = async () => {
@@ -28,61 +29,56 @@ const ManageProducts: React.FC = () => {
     setShowCreateProductModal(false);
   };
 
-  const handleCreateProduct = async (product: CreateProductDto) => {
+  const handleCreateProduct = async (product: ProductForm) => {
     try {
+      setIsLoading(true);
+      setShowCreateProductModal(false);
       console.log('Creating product:', product);
-      
-      let imageUrl = '';
-      
+      console.log("product", product);
+      let imageUrls = [];
+      console.log("product.image", product.image);
       // If there's an image file, upload it to S3 first
-      if (product.image && product.image instanceof File) {
-        console.log('Uploading image:', product.image.name);
-        
-        // Generate a unique key for the file
-        const fileExtension = product.image.name.split('.').pop();
-        const uniqueKey = `products/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
-        
-        // Get the presigned upload URL
-        const uploadUrl = await generateUploadUrl(uniqueKey, product.image.type);
-        console.log('Upload URL generated:', uploadUrl);
-        
-        // Upload the file to S3
-        console.log('Uploading with Content-Type:', product.image.type);
-        console.log('File size:', product.image.size);
-        
-        console.log('Content-Type', product.image.type);
-        const uploadResponse = await fetch(uploadUrl, {
-          method: 'PUT',
-          body: product.image,
-          headers: {
-            'Content-Type': product.image.type,
-          },
-        });
-        
-        console.log('Upload response status:', uploadResponse.status);
-        console.log('Upload response headers:', Object.fromEntries(uploadResponse.headers.entries()));
-        
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          console.error('Upload error details:', errorText);
-          throw new Error(`Failed to upload image: ${uploadResponse.status} ${uploadResponse.statusText} - ${errorText}`);
+      for (const image of product.image) {
+        if (image instanceof File) {
+          console.log('Uploading image:', image.name);
+      
+          const fileExtension = image.name.split('.').pop();
+          const uniqueKey = `products/${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2)}.${fileExtension}`;
+      
+          const uploadUrl = await generateUploadUrl(uniqueKey, image.type);
+      
+          const uploadResponse = await fetch(uploadUrl, {
+            method: 'PUT',
+            body: image,
+            headers: {
+              'Content-Type': image.type,
+            },
+          });
+      
+          if (!uploadResponse.ok) {
+            const errorText = await uploadResponse.text();
+            throw new Error(
+              `Failed to upload image: ${uploadResponse.status} ${errorText}`
+            );
+          }
+      
+          // Store S3 key or public URL
+          imageUrls.push(uniqueKey);
+        } else if (typeof image === 'string') {
+          // Already uploaded image
+          imageUrls.push(image);
         }
-        console.log("upload response ", uploadResponse);
-        console.log('Image uploaded successfully');
-        
-        // Construct the public URL (you might need to adjust this based on your S3 setup)
-        imageUrl = `${uniqueKey}`;
-      } else if (product.image && typeof product.image === 'string') {
-        // If image is already a URL string, use it directly
-        imageUrl = product.image;
       }
       
+      
       // Create the product with the image URL
-      const productData = {
+      const productData: CreateProductDto = {
         name: product.name,
         price: product.price,
         description: product.description,
-        image: imageUrl || undefined,
+        image: imageUrls ? imageUrls : [],
       };
       
       console.log('Creating product in database:', productData);
@@ -91,21 +87,30 @@ const ManageProducts: React.FC = () => {
       
       // Close the modal on success
       setShowCreateProductModal(false);
-      
+      setIsLoading(false);
       // You might want to show a success message here
       alert('Product created successfully!');
       
     } catch (error) {
+      setIsLoading(false);
+      setShowCreateProductModal(true);
       console.error('Error creating product:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       alert(`Failed to create product: ${errorMessage}`);
     }
   }
 
-  
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-yellow-50">
+      {isLoading && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+            <p className="text-gray-700 font-medium">Creating product...</p>
+          </div>
+        </div>
+      )}
+      
       {
         showCreateProductModal && (
           <CreateProductModal
@@ -142,7 +147,7 @@ const ManageProducts: React.FC = () => {
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {products.map(prod => (
-                <ProductCard key={prod.id} product={prod} />
+                <ProductCard key={prod.id} product={prod} showEditButton={true} />
               ))}
             </div>
           </div>

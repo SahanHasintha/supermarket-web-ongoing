@@ -1,15 +1,24 @@
 import { Product } from "../types/Product";
 
-const ProductCard = ({ product }: { product: Product }) => {
+const ProductCard = ({ product, showEditButton }: { product: Product, showEditButton: boolean }) => {
   const { name, price, image } = product;
   return (
     <div className="group w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 hover:border-green-300">
       <div className="relative overflow-hidden bg-gray-50">
         <img 
           className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500" 
-          src={`${import.meta.env.VITE_CDN_URL}/${image}`} 
+          src={`${import.meta.env.VITE_CDN_URL}/${image[0]}`} 
           alt={name} 
         />
+        {showEditButton && (
+        <div className="absolute top-2 left-2">
+          <div className="flex items-center justify-center w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors cursor-pointer">
+            <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+        </div>
+        )}
         <div className="absolute top-2 right-2">
           <div className="flex items-center gap-0.5 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full shadow-sm">
             <svg className="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 24 24">
