@@ -8,11 +8,23 @@ import { getProducts } from '../services/ProductService';
 import { useSelector } from 'react-redux';
 import { RootState } from '../app/store';
 
+type Mode = 'create' | 'edit';
+
 const ManageProducts: React.FC = () => {
   const [showCreateProductModal, setShowCreateProductModal] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user);
+  const [productToEdit, setProductToEdit] = useState<Product | null>(null);
+  const [mode, setMode] = useState<Mode>('create');
+
+  const handleOpenEditProduct = (product: Product) => {
+    console.log('Opening edit product modal for product:', product);
+    setProductToEdit(product);
+    setMode('edit');
+    setShowCreateProductModal(true);
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       const products = await getProducts();
@@ -22,11 +34,13 @@ const ManageProducts: React.FC = () => {
     fetchProducts();
   }, []);
   const handleOpenCreateProduct = () => {
+    setMode('create');
     setShowCreateProductModal(true);
   };
 
   const handleCloseCreateProductModal = () => {
     setShowCreateProductModal(false);
+    setMode('create');
   };
 
   const handleCreateProduct = async (product: ProductForm) => {
@@ -114,6 +128,8 @@ const ManageProducts: React.FC = () => {
       {
         showCreateProductModal && (
           <CreateProductModal
+            mode={mode}
+            product={productToEdit ?? undefined}
             onClose={handleCloseCreateProductModal}
             onCreate={handleCreateProduct}
           />
@@ -147,7 +163,7 @@ const ManageProducts: React.FC = () => {
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {products.map(prod => (
-                <ProductCard key={prod.id} product={prod} showEditButton={true} />
+                <ProductCard key={prod.id} product={prod} showEditButton={true} onEdit={handleOpenEditProduct} />
               ))}
             </div>
           </div>

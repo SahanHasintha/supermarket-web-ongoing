@@ -1,6 +1,12 @@
 import { Product } from "../types/Product";
 
-const ProductCard = ({ product, showEditButton }: { product: Product, showEditButton: boolean }) => {
+interface ProductCardProps {
+  product: Product;
+  showEditButton: boolean;
+  onEdit?: (product: Product) => void;
+}
+
+const ProductCard = ({ product, showEditButton, onEdit }: ProductCardProps) => {
   const { name, price, image } = product;
   return (
     <div className="group w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 hover:border-green-300">
@@ -10,8 +16,8 @@ const ProductCard = ({ product, showEditButton }: { product: Product, showEditBu
           src={`${import.meta.env.VITE_CDN_URL}/${image[0]}`} 
           alt={name} 
         />
-        {showEditButton && (
-        <div className="absolute top-2 left-2">
+        {showEditButton && onEdit && (
+        <div className="absolute top-2 left-2" onClick={() => onEdit?.(product)}>
           <div className="flex items-center justify-center w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors cursor-pointer">
             <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

@@ -1,7 +1,16 @@
-import {useState} from 'react';
-import { ProductForm } from '../types/Product';
+import {useEffect, useState} from 'react';
+import { Product, ProductForm } from '../types/Product';
 
-const CreateProductModal = ({ onClose, onCreate } : { onClose: () => void; onCreate: (product: ProductForm) => void }) => {
+type ProductModalMode = 'create' | 'edit';
+
+interface ProductModalProps {
+  mode: ProductModalMode;
+  product?: Product;
+  onClose: () => void;
+  onCreate: (data: ProductForm) => void;
+}
+
+const CreateProductModal = ({  mode, product, onClose, onCreate } : ProductModalProps) => {
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     price: 0,
@@ -9,6 +18,26 @@ const CreateProductModal = ({ onClose, onCreate } : { onClose: () => void; onCre
     image: [],
   });
   const [image, setImage] = useState<File[]>([]);
+
+  useEffect(() => {
+    if (mode === 'edit' && product) {
+      setFormData({
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        image: [],
+      });
+    }
+  
+    if (mode === 'create') {
+      setFormData({
+        name: '',
+        price: 0,
+        description: '',
+        image: [],
+      });
+    }
+  }, [mode, product]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImage(Array.from(e.target.files || []) as File[]);
