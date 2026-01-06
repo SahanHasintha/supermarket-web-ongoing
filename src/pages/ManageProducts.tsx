@@ -39,20 +39,15 @@ const ManageProducts: React.FC = () => {
   };
 
   const handleCloseCreateProductModal = () => {
+    setProductToEdit(null);
     setShowCreateProductModal(false);
     setMode('create');
   };
 
-  const handleCreateProduct = async (product: ProductForm) => {
+  const uploadImagesToS3 = async (images: File[]) => {
     try {
-      setIsLoading(true);
-      setShowCreateProductModal(false);
-      console.log('Creating product:', product);
-      console.log("product", product);
       let imageUrls = [];
-      console.log("product.image", product.image);
-      // If there's an image file, upload it to S3 first
-      for (const image of product.image) {
+      for (const image of images) {
         if (image instanceof File) {
           console.log('Uploading image:', image.name);
       
@@ -85,8 +80,36 @@ const ManageProducts: React.FC = () => {
           imageUrls.push(image);
         }
       }
-      
-      
+      return imageUrls;
+    }
+    catch (error) {
+      console.error('Error uploading images to S3:', error);
+      throw error;
+    }
+  }
+
+  const handleEditProduct = async (product: ProductForm) => {
+    try {
+      setIsLoading(true);
+      setShowCreateProductModal(false);
+    } catch (error) {
+      setIsLoading(false);
+      setShowCreateProductModal(true);
+      console.error('Error editing product:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Failed to edit product: ${errorMessage}`);
+    }
+  }
+
+  const handleCreateProduct = async (product: ProductForm) => {
+    try {
+      setIsLoading(true);
+      setShowCreateProductModal(false);
+      console.log('Creating product:', product);
+      console.log("product", product);
+      console.log("product.image", product.newImages);
+      // If there's an image file, upload it to S3 first
+      const imageUrls = await uploadImagesToS3(product.newImages);
       // Create the product with the image URL
       const productData: CreateProductDto = {
         name: product.name,
@@ -104,13 +127,28 @@ const ManageProducts: React.FC = () => {
       setIsLoading(false);
       // You might want to show a success message here
       alert('Product created successfully!');
-      
     } catch (error) {
       setIsLoading(false);
       setShowCreateProductModal(true);
       console.error('Error creating product:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       alert(`Failed to create product: ${errorMessage}`);
+    }
+  }
+
+  const handleSubmitProduct = async (product: ProductForm) => {
+    try {
+      if (mode === 'create') {
+        await handleCreateProduct(product);
+      } else if (mode === 'edit') {
+        await handleEditProduct(product);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setShowCreateProductModal(true);
+      console.error('Error submitting product:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Failed to submit product: ${errorMessage}`);
     }
   }
 
@@ -131,7 +169,7 @@ const ManageProducts: React.FC = () => {
             mode={mode}
             product={productToEdit ?? undefined}
             onClose={handleCloseCreateProductModal}
-            onCreate={handleCreateProduct}
+            onSubmit={handleSubmitProduct}
           />
         )
       }

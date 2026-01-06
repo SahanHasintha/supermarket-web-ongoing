@@ -1,8 +1,12 @@
 export interface ProductForm {
   name: string;
   price: number;
-  image: (File | string)[];
   description?: string;
+
+  // NEW
+  newImages: File[];
+  existingKeys: string[];
+  removedKeys: string[];
 }
 
 export interface CreateProductDto {

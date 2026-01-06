@@ -7,17 +7,22 @@ interface ProductModalProps {
   mode: ProductModalMode;
   product?: Product;
   onClose: () => void;
-  onCreate: (data: ProductForm) => void;
+  onSubmit: (data: ProductForm) => void;
 }
 
-const CreateProductModal = ({  mode, product, onClose, onCreate } : ProductModalProps) => {
+const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModalProps) => {
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     price: 0,
     description: '',
-    image: [],
+    newImages: [],
+    existingKeys: [],
+    removedKeys: [],
   });
-  const [image, setImage] = useState<File[]>([]);
+
+  const [existingImageKeys, setExistingImageKeys] = useState<string[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [removedImageKeys, setRemovedImageKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (mode === 'edit' && product) {
@@ -25,8 +30,14 @@ const CreateProductModal = ({  mode, product, onClose, onCreate } : ProductModal
         name: product.name,
         price: product.price,
         description: product.description,
-        image: [],
+        newImages: [],
+        existingKeys: [],
+        removedKeys: [],
       });
+  
+      setExistingImageKeys(product.image); // 👈 preload
+      setNewImages([]);
+      setRemovedImageKeys([]);
     }
   
     if (mode === 'create') {
@@ -34,13 +45,32 @@ const CreateProductModal = ({  mode, product, onClose, onCreate } : ProductModal
         name: '',
         price: 0,
         description: '',
-        image: [],
+        newImages: [],
+        existingKeys: [],
+        removedKeys: [],
       });
+  
+      setExistingImageKeys([]);
+      setNewImages([]);
+      setRemovedImageKeys([]);
+    }
+  }, [mode, product]);
+  
+
+  useEffect(() => {
+    console.log('Mode:', mode);
+    console.log('Product to edit:', product);
+    if (product && mode === 'edit' && product.image.length > 0) {
+      console.log('Product to edit has images:', product.image);
     }
   }, [mode, product]);
 
+  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setImage(Array.from(e.target.files || []) as File[]);
+  // };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setImage(Array.from(e.target.files || []) as File[]);
+    setNewImages(Array.from(e.target.files || []) as File[]);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +84,7 @@ const CreateProductModal = ({  mode, product, onClose, onCreate } : ProductModal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    onCreate({ ...formData, image } as ProductForm);
+    onSubmit({ ...formData, newImages, existingImageKeys, removedImageKeys } as ProductForm);
   };
 
   return (
@@ -126,7 +156,30 @@ const CreateProductModal = ({  mode, product, onClose, onCreate } : ProductModal
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               required
             />
+
+            <div className="grid grid-cols-3 gap-3">
+              {existingImageKeys.map((key) => (
+                <div key={key} className="relative">
+                  <img
+                    src={`${import.meta.env.VITE_CDN_URL}/${key}`}
+                    className="w-full h-24 object-cover rounded"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExistingImageKeys(prev => prev.filter(k => k !== key));
+                      setRemovedImageKeys(prev => [...prev, key]);
+                    }}
+                    className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
+
           
           <div className="flex gap-4 pt-4">
             <button
@@ -140,7 +193,7 @@ const CreateProductModal = ({  mode, product, onClose, onCreate } : ProductModal
               type="submit"
               className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200"
             >
-              Create Product
+              {mode === 'create' ? 'Create Product' : 'Update Product'}
             </button>
           </div>
         </form>
