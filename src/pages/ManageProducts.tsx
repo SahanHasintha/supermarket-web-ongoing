@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CreateProductModal from '../components/CreateProductModal';
-import { Product, ProductForm, CreateProductDto } from '../types/Product';
-import {createProduct} from '../services/ProductService';
+import { Product, ProductForm, CreateProductDto, UpdateProductDto } from '../types/Product';
+import {createProduct, updateProduct} from '../services/ProductService';
 import { generateUploadUrl } from '../services/UploadService';
 import ProductCard from '../components/ProductCard';
 import { getProducts } from '../services/ProductService';
@@ -92,6 +92,22 @@ const ManageProducts: React.FC = () => {
     try {
       setIsLoading(true);
       setShowCreateProductModal(false);
+      const imageUrls = await uploadImagesToS3(product.newImages);
+      const newImageKeys = [...product.existingKeys, ...imageUrls];
+      const productData: UpdateProductDto = {
+        id: productToEdit?.id ?? '',
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        image: newImageKeys ? newImageKeys : [],
+      };
+      const updateProductRes = await updateProduct(productData);
+      console.log('Product updated successfully:', updateProductRes);
+      alert('Product updated successfully!');
+      setShowCreateProductModal(false);
+      setIsLoading(false);
+      setProductToEdit(null);
+      setMode('create');
     } catch (error) {
       setIsLoading(false);
       setShowCreateProductModal(true);
@@ -110,6 +126,7 @@ const ManageProducts: React.FC = () => {
       console.log("product.image", product.newImages);
       // If there's an image file, upload it to S3 first
       const imageUrls = await uploadImagesToS3(product.newImages);
+
       // Create the product with the image URL
       const productData: CreateProductDto = {
         name: product.name,

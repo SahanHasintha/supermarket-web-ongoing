@@ -1,4 +1,4 @@
-import { CreateProductDto } from '../types/Product';
+import { CreateProductDto, UpdateProductDto } from '../types/Product';
 import api from './api';
 
 const createProduct = async (product: CreateProductDto) => {
@@ -12,4 +12,9 @@ const getProducts = async () => {
   return response.data;
 };
 
-export {createProduct, getProducts};
+const updateProduct = async (product: UpdateProductDto) => {
+  const response = await api.patch('/products', product);
+  return response.data;
+};
+
+export {createProduct, getProducts, updateProduct};

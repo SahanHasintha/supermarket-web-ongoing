@@ -20,10 +20,6 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
     removedKeys: [],
   });
 
-  const [existingImageKeys, setExistingImageKeys] = useState<string[]>([]);
-  const [newImages, setNewImages] = useState<File[]>([]);
-  const [removedImageKeys, setRemovedImageKeys] = useState<string[]>([]);
-
   useEffect(() => {
     if (mode === 'edit' && product) {
       setFormData({
@@ -31,13 +27,9 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
         price: product.price,
         description: product.description,
         newImages: [],
-        existingKeys: [],
+        existingKeys: product.image,
         removedKeys: [],
       });
-  
-      setExistingImageKeys(product.image); // 👈 preload
-      setNewImages([]);
-      setRemovedImageKeys([]);
     }
   
     if (mode === 'create') {
@@ -49,10 +41,6 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
         existingKeys: [],
         removedKeys: [],
       });
-  
-      setExistingImageKeys([]);
-      setNewImages([]);
-      setRemovedImageKeys([]);
     }
   }, [mode, product]);
   
@@ -70,7 +58,7 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
   // };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewImages(Array.from(e.target.files || []) as File[]);
+    setFormData(prev => ({ ...prev, newImages: Array.from(e.target.files || []) as File[] }));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +72,7 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    onSubmit({ ...formData, newImages, existingImageKeys, removedImageKeys } as ProductForm);
+    onSubmit(formData);
   };
 
   return (
@@ -154,11 +142,11 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
               multiple={true}
               accept="image/*"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              required
+              required = {mode === 'create'}
             />
 
             <div className="grid grid-cols-3 gap-3">
-              {existingImageKeys.map((key) => (
+              {formData.existingKeys.map((key) => (
                 <div key={key} className="relative">
                   <img
                     src={`${import.meta.env.VITE_CDN_URL}/${key}`}
@@ -168,8 +156,7 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
                   <button
                     type="button"
                     onClick={() => {
-                      setExistingImageKeys(prev => prev.filter(k => k !== key));
-                      setRemovedImageKeys(prev => [...prev, key]);
+                      setFormData(prev => ({ ...prev, existingKeys: prev.existingKeys.filter(k => k !== key), removedKeys: [...prev.removedKeys, key] }));
                     }}
                     className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full"
                   >
