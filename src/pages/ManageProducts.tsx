@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import CreateProductModal from '../components/CreateProductModal';
+import CreateProductModal from '../components/CreateAndUpdateProductModal';
 import { Product, ProductForm, CreateProductDto, UpdateProductDto } from '../types/Product';
 import {createProduct, updateProduct} from '../services/ProductService';
 import { generateUploadUrl } from '../services/UploadService';
@@ -90,8 +90,8 @@ const ManageProducts: React.FC = () => {
 
   const handleEditProduct = async (product: ProductForm) => {
     try {
-      setIsLoading(true);
       setShowCreateProductModal(false);
+      console.log("product.newImages", product.newImages);
       const imageUrls = await uploadImagesToS3(product.newImages);
       const newImageKeys = [...product.existingKeys, ...imageUrls];
       const productData: UpdateProductDto = {
@@ -104,10 +104,6 @@ const ManageProducts: React.FC = () => {
       const updateProductRes = await updateProduct(productData);
       console.log('Product updated successfully:', updateProductRes);
       alert('Product updated successfully!');
-      setShowCreateProductModal(false);
-      setIsLoading(false);
-      setProductToEdit(null);
-      setMode('create');
     } catch (error) {
       setIsLoading(false);
       setShowCreateProductModal(true);
@@ -119,15 +115,12 @@ const ManageProducts: React.FC = () => {
 
   const handleCreateProduct = async (product: ProductForm) => {
     try {
-      setIsLoading(true);
       setShowCreateProductModal(false);
       console.log('Creating product:', product);
       console.log("product", product);
       console.log("product.image", product.newImages);
-      // If there's an image file, upload it to S3 first
       const imageUrls = await uploadImagesToS3(product.newImages);
 
-      // Create the product with the image URL
       const productData: CreateProductDto = {
         name: product.name,
         price: product.price,
@@ -139,10 +132,6 @@ const ManageProducts: React.FC = () => {
       const response = await createProduct(productData);
       console.log('Product created successfully:', response);
       
-      // Close the modal on success
-      setShowCreateProductModal(false);
-      setIsLoading(false);
-      // You might want to show a success message here
       alert('Product created successfully!');
     } catch (error) {
       setIsLoading(false);
@@ -155,11 +144,16 @@ const ManageProducts: React.FC = () => {
 
   const handleSubmitProduct = async (product: ProductForm) => {
     try {
+      setIsLoading(true);
       if (mode === 'create') {
         await handleCreateProduct(product);
       } else if (mode === 'edit') {
         await handleEditProduct(product);
       }
+      setShowCreateProductModal(false);
+      setIsLoading(false);
+      setProductToEdit(null);
+      setMode('create');
     } catch (error) {
       setIsLoading(false);
       setShowCreateProductModal(true);

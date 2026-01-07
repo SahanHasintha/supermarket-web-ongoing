@@ -10,7 +10,7 @@ interface ProductModalProps {
   onSubmit: (data: ProductForm) => void;
 }
 
-const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModalProps) => {
+const CreateAndUpdateProductModal = ({  mode, product, onClose, onSubmit } : ProductModalProps) => {
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     price: 0,
@@ -189,4 +189,4 @@ const CreateProductModal = ({  mode, product, onClose, onSubmit } : ProductModal
   );
 };
 
-export default CreateProductModal;
+export default CreateAndUpdateProductModal;

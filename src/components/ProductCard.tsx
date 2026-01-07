@@ -1,15 +1,21 @@
+import React from 'react';
 import { Product } from "../types/Product";
 
 interface ProductCardProps {
   product: Product;
   showEditButton: boolean;
   onEdit?: (product: Product) => void;
+  onClick?: (product: Product) => void;
 }
 
-const ProductCard = ({ product, showEditButton, onEdit }: ProductCardProps) => {
+const ProductCard = ({ product, showEditButton, onEdit, onClick }: ProductCardProps) => {
   const { name, price, image } = product;
+  console.log('Rendering ProductCard:', product.id);
   return (
-    <div className="group w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 hover:border-green-300">
+    <div 
+      className="group w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 hover:border-green-300"
+      onClick={() => onClick?.(product)}
+    >
       <div className="relative overflow-hidden bg-gray-50">
         <img 
           className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500" 
@@ -60,4 +66,4 @@ const ProductCard = ({ product, showEditButton, onEdit }: ProductCardProps) => {
   )
 }
 
-export default ProductCard
+export default React.memo(ProductCard)

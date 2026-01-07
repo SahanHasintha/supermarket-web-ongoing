@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { Product } from '../types/Product';
 import ProductCard from '../components/ProductCard';
 import { getProducts } from '../services/ProductService';
@@ -6,10 +6,14 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../app/store';
 import { useNavigate } from 'react-router-dom';
 
+const ViewProductCard = lazy(() => import('../components/ViewProductCard'));
+
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const user = useSelector((state: RootState) => state.auth.user);
   const navigate = useNavigate();
+  const [showViewProductModal, setShowViewProductModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   useEffect(() => {
     const fetchProducts = async () => {
@@ -24,9 +28,12 @@ const Products: React.FC = () => {
     navigate('/manage-products');
   };
 
+  const handleProductClick = useCallback((product: Product) => {
+    console.log('Product clicked:', product);
+    setSelectedProduct(product);
+    setShowViewProductModal(true);
+  }, []);
 
-
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-orange-50 to-yellow-50">
@@ -58,7 +65,7 @@ const Products: React.FC = () => {
           <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {products.map(prod => (
-                <ProductCard key={prod.id} product={prod} showEditButton={false}/>
+                <ProductCard key={prod.id} product={prod} showEditButton={false} onClick={handleProductClick}/>
               ))}
             </div>
           </div>
@@ -83,6 +90,11 @@ const Products: React.FC = () => {
           </div>
         )}
       </div>
+      {showViewProductModal && selectedProduct && (
+        <Suspense fallback={<div>Loading...</div>}> 
+          <ViewProductCard product={selectedProduct} onClose={() => setShowViewProductModal(false)} />
+        </Suspense>
+      )}
     </div>
   );
 };
