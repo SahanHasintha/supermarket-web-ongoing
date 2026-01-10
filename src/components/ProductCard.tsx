@@ -14,7 +14,6 @@ const ProductCard = ({ product, showEditButton, onEdit, onClick }: ProductCardPr
   return (
     <div 
       className="group w-full bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-gray-100 hover:border-green-300"
-      onClick={() => onClick?.(product)}
     >
       <div className="relative overflow-hidden bg-gray-50">
         <img 
@@ -41,7 +40,9 @@ const ProductCard = ({ product, showEditButton, onEdit, onClick }: ProductCardPr
         </div>
       </div>
       
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-4 flex flex-col flex-grow cursor-pointer" 
+        onClick={() => onClick?.(product)}
+        >
         <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-green-600 transition-colors">
           {name}
         </h3>

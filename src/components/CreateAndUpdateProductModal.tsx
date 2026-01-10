@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {memo, useEffect, useState} from 'react';
 import { Product, ProductForm } from '../types/Product';
 
 type ProductModalMode = 'create' | 'edit';
@@ -189,4 +189,4 @@ const CreateAndUpdateProductModal = ({  mode, product, onClose, onSubmit } : Pro
   );
 };
 
-export default CreateAndUpdateProductModal;
+export default memo(CreateAndUpdateProductModal);

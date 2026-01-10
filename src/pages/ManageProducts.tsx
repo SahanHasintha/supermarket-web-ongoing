@@ -1,5 +1,4 @@
 import React, { useState, useCallback, Suspense, lazy } from 'react';
-import CreateProductModal from '../components/CreateAndUpdateProductModal';
 import { Product, ProductForm, CreateProductDto, UpdateProductDto } from '../types/Product';
 import {createProduct, updateProduct} from '../services/ProductService';
 import { generateUploadUrl } from '../services/UploadService';
@@ -8,6 +7,9 @@ import { RootState } from '../app/store';
 import ProductGrid from '../components/ProductGrid';
 import { useProducts } from '../hooks/useProduct';
 import { useProductViewModal } from '../hooks/useProductViewModal';
+import { deleteImages } from '../services/UploadService';
+
+const CreateProductModal = lazy(() => import('../components/CreateAndUpdateProductModal'));
 const ViewProductCard = lazy(() => import('../components/ViewProductCard'));
 type Mode = 'create' | 'edit';
 
@@ -20,16 +22,17 @@ const ManageProducts: React.FC = () => {
   const { products, loading } = useProducts(false);
   const { selectedProduct, isOpenProductViewModal, openProductViewModal, closeProductViewModal } = useProductViewModal();
 
-  const handleOpenEditProduct = (product: Product) => {
+  const handleOpenEditProduct = useCallback((product: Product) => {
     console.log('Opening edit product modal for product:', product);
     setProductToEdit(product);
     setMode('edit');
     setShowCreateProductModal(true);
-  };
-  const handleOpenCreateProduct = () => {
+  }, []);
+
+  const handleOpenCreateProduct = useCallback(() => {
     setMode('create');
     setShowCreateProductModal(true);
-  };
+  }, []);
 
   const handleCloseCreateProductModal = useCallback(() => {
     setProductToEdit(null);
@@ -85,6 +88,10 @@ const ManageProducts: React.FC = () => {
     try {
       setShowCreateProductModal(false);
       console.log("product.newImages", product.newImages);
+      const removedImageKeys = product.removedKeys;
+      if (removedImageKeys.length > 0) {
+        await deleteImages(removedImageKeys);
+      }
       const imageUrls = await uploadImagesToS3(product.newImages);
       const newImageKeys = [...product.existingKeys, ...imageUrls];
       const productData: UpdateProductDto = {
@@ -171,12 +178,15 @@ const ManageProducts: React.FC = () => {
       
       {
         showCreateProductModal && (
-          <CreateProductModal
-            mode={mode}
-            product={productToEdit ?? undefined}
-            onClose={handleCloseCreateProductModal}
-            onSubmit={handleSubmitProduct}
-          />
+          <Suspense fallback={<div>Loading...</div>}>
+            <CreateProductModal
+              mode={mode}
+              product={productToEdit ?? undefined}
+              onClose={handleCloseCreateProductModal}
+              onSubmit={handleSubmitProduct}
+            />
+          </Suspense>
+          
         )
       }
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
