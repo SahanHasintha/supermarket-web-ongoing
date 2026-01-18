@@ -9,7 +9,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, showEditButton, onEdit, onClick }: ProductCardProps) => {
-  const { name, price, image } = product;
+  const { name, price, images } = product;
   console.log('Rendering ProductCard:', product.id);
   return (
     <div 
@@ -18,7 +18,7 @@ const ProductCard = ({ product, showEditButton, onEdit, onClick }: ProductCardPr
       <div className="relative overflow-hidden bg-gray-50">
         <img 
           className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500" 
-          src={`${import.meta.env.VITE_CDN_URL}/${image[0]}`} 
+          src={`${import.meta.env.VITE_CDN_URL}/${images[0].url}`} 
           alt={name} 
         />
         {showEditButton && onEdit && (

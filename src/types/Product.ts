@@ -16,11 +16,16 @@ export interface CreateProductDto {
   description?: string;
 }
 
+export interface ProductImage {
+  url: string;
+  isThumbnail: boolean;
+}
+
 export interface Product {
   id: string;
   name: string;
   price: number;
-  image: string[];
+  images: ProductImage[];
   description?: string;
 }
 

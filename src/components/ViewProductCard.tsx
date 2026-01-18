@@ -7,7 +7,7 @@ interface ViewProductCardProps {
 }
 
 const ViewProductCard = ({ product, onClose }: ViewProductCardProps) => {
-  const { name, price, image, description } = product;
+  const { name, price, images, description } = product;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   return (
@@ -27,20 +27,20 @@ const ViewProductCard = ({ product, onClose }: ViewProductCardProps) => {
           {/* Image Gallery Section */}
           <div className="space-y-4">
             {/* Main Image */}
-            {image && image.length > 0 ? (
+            {images && images.length > 0 ? (
               <>
                 <div className="w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
                   <img
-                    src={`${import.meta.env.VITE_CDN_URL}/${image[selectedImageIndex]}`}
+                    src={`${import.meta.env.VITE_CDN_URL}/${images[selectedImageIndex].url}`}
                     alt={name}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 
                 {/* Thumbnail Gallery */}
-                {image.length > 1 && (
+                {images.length > 1 && (
                   <div className="grid grid-cols-4 gap-2">
-                    {image.map((imgKey, index) => (
+                    {images.map((img, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
@@ -51,7 +51,7 @@ const ViewProductCard = ({ product, onClose }: ViewProductCardProps) => {
                         }`}
                       >
                         <img
-                          src={`${import.meta.env.VITE_CDN_URL}/${imgKey}`}
+                          src={`${import.meta.env.VITE_CDN_URL}/${img.url}`}
                           alt={`${name} - ${index + 1}`}
                           className="w-full h-full object-cover"
                         />
