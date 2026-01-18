@@ -27,7 +27,7 @@ const CreateAndUpdateProductModal = ({  mode, product, onClose, onSubmit } : Pro
         price: product.price,
         description: product.description,
         newImages: [],
-        existingKeys: product.image,
+        existingKeys: product.images.map(img => img.url),
         removedKeys: [],
       });
     }
@@ -44,14 +44,6 @@ const CreateAndUpdateProductModal = ({  mode, product, onClose, onSubmit } : Pro
     }
   }, [mode, product]);
   
-
-  useEffect(() => {
-    console.log('Mode:', mode);
-    console.log('Product to edit:', product);
-    if (product && mode === 'edit' && product.image.length > 0) {
-      console.log('Product to edit has images:', product.image);
-    }
-  }, [mode, product]);
 
   // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   setImage(Array.from(e.target.files || []) as File[]);

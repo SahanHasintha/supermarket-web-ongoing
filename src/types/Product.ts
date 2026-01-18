@@ -1,3 +1,9 @@
+
+export interface ProductImage {
+  url: string;
+  isThumbnail: boolean;
+}
+
 export interface ProductForm {
   name: string;
   price: number;
@@ -14,11 +20,6 @@ export interface CreateProductDto {
   price: number;
   image: string[]; // uploaded URLs/keys
   description?: string;
-}
-
-export interface ProductImage {
-  url: string;
-  isThumbnail: boolean;
 }
 
 export interface Product {
